@@ -6,10 +6,18 @@ import { TopPageModule } from './top-page/top-page.module';
 import { ProductModule } from './product/product.module';
 import { ReviewModule } from './review/review.module';
 import { ConfigModule } from '@nestjs/config';
+import { MongooseModule } from '@nestjs/mongoose';
+import { ConfigService } from '@nestjs/config/dist/config.service';
+import { getMongoConfig } from './configs/mongo.config';
 
 @Module({
 	imports: [
 		ConfigModule.forRoot(),
+		MongooseModule.forRootAsync({
+			imports: [ConfigModule],
+			inject: [ConfigService],
+			useFactory: getMongoConfig,
+		}),
 		AuthModule,
 		TopPageModule,
 		ProductModule,
