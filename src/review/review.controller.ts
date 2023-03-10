@@ -17,7 +17,7 @@ import { ReviewService } from './review.service';
 
 @Controller('review')
 export class ReviewController {
-	constructor(@Inject() private readonly reviewService: ReviewService) {}
+	constructor(private readonly reviewService: ReviewService) {}
 
 	@Post('create')
 	async create(@Body() dto: CreateReviewDto) {
