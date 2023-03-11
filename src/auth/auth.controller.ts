@@ -7,6 +7,7 @@ import {
 	UsePipes,
 	ValidationPipe,
 } from '@nestjs/common';
+import { AuthErrors } from './auth.constants';
 import { AuthService } from './auth.service';
 import { AuthDto } from './dto/auth.dto';
 
@@ -19,15 +20,17 @@ export class AuthController {
 		const oldUser = await this.authService.findUser(dto.login);
 
 		if (oldUser) {
-			throw new BadRequestException(
-				'We already have user with this email',
-			);
+			throw new BadRequestException(AuthErrors.DUPLICATE_USER);
 		}
 
 		return await this.authService.createUser(dto);
 	}
 
+	@UsePipes(new ValidationPipe())
 	@HttpCode(200)
 	@Post('login')
-	async login(@Body() dto: AuthDto) {}
+	async login(@Body() { login, password }: AuthDto) {
+		const { email } = await this.authService.validateUser(login, password);
+		return this.authService.login(email);
+	}
 }
