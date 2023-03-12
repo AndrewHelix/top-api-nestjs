@@ -13,6 +13,7 @@ import {
 	ValidationPipe,
 } from '@nestjs/common';
 import { Response } from 'express';
+import { IdValidationPipe } from 'src/pipes/idValidation.pipe';
 import { User } from '../auth/decorators/user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt.guard';
 import { CreateReviewDto } from './dto/create.review.dto';
@@ -31,7 +32,7 @@ export class ReviewController {
 
 	@UseGuards(JwtAuthGuard)
 	@Delete(':id')
-	async delete(@Param('id') id: string, @Res() res: Response) {
+	async delete(@Param('id', IdValidationPipe) id: string, @Res() res: Response) {
 		const deletedDoc = await this.reviewService.delete(id);
 
 		if (!deletedDoc) {
@@ -47,7 +48,7 @@ export class ReviewController {
 	@UseGuards(JwtAuthGuard)
 	@Get('byProduct/:productId')
 	async getByProduct(
-		@Param('productId') productId: string,
+		@Param('productId', IdValidationPipe) productId: string,
 		@User() email: string,
 	) {
 		console.log(email);
