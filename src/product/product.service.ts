@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Aggregate, Model } from 'mongoose';
+import { Aggregate, HydratedDocumentFromSchema, Model } from 'mongoose';
 import { ReviewModel } from 'src/review/review.model';
 import { CreateProductDto } from './dto/create.product.dto';
 import { FindProductDto } from './dto/find.product.dto';
@@ -56,6 +56,23 @@ export class ProductService {
 				$addFields: {
 					reviewCount: { $size: '$reviews' },
 					reviewAvg: { $avg: '$reviews.rating' },
+					reviews: {
+						$function: {
+							body: function (reviews: ProductDocument[]) {
+								return reviews.sort(
+									(a, b) =>
+										new Date(
+											b.createdAt as string,
+										).valueOf() -
+										new Date(
+											a.createdAt as string,
+										).valueOf(),
+								);
+							},
+							args: ['reviews'],
+							lang: 'js',
+						},
+					},
 				},
 			},
 		]) as Aggregate<
